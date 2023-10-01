@@ -51,7 +51,8 @@ int main(){
 
     for(int i = 0; i < numTestes; i++){
     printf("%s\n", res[i]);
+    free(res[i]);
     }
     
-       
+    free(res);
 }
