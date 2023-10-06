@@ -2,3 +2,4 @@
 output/
 teste.c
 revisao_ip/output/
+*.json
