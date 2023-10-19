@@ -8,12 +8,12 @@ int main(){
     scanf("%d", &numTestes);
 
     char **res = (char **) malloc(numTestes * sizeof(char *));
-    for(int i = 0; i < numTestes; i++){
+    for(i = 0; i < numTestes; i++){
         res[i] = (char *) malloc(20 * sizeof(char));
     }
 
     int *numeros = (int *) malloc(numTestes * sizeof(int));
-    for(int i = 0; i < numTestes; i++){
+    for(i = 0; i < numTestes; i++){
         scanf("%d", &numeros[i]);
     }
     
@@ -49,7 +49,7 @@ int main(){
         }
     }
 
-    for(int i = 0; i < numTestes; i++){
+    for(i = 0; i < numTestes; i++){
     printf("%s\n", res[i]);
     free(res[i]);
     }

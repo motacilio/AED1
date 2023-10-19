@@ -4,7 +4,7 @@
 
 int main(){
 
-    int qntdRotulos, qntdBalas;
+    int i, qntdRotulos, qntdBalas;
 
     while(1){
         scanf("%d %d", &qntdRotulos, &qntdBalas);
@@ -15,14 +15,14 @@ int main(){
 
     int *listaRotulos = (int *) calloc(qntdBalas, sizeof(int));
     
-    for(int i = 0; i < qntdRotulos; i++){
+    for(i = 0; i < qntdRotulos; i++){
         int rotAtual; scanf("%d", &rotAtual);
         listaRotulos[rotAtual]++;
     }
 
     int envelopes = qntdRotulos;
 
-    for(int i = 1; i <= qntdBalas; i++){
+    for(i = 1; i <= qntdBalas; i++){
         envelopes = envelopes < listaRotulos[i] ? envelopes : listaRotulos[i];
     }
 

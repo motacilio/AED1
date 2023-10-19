@@ -4,7 +4,7 @@
 
 int main(){
 
-    int qntdNums, num, numAux, numInv = 0;
+    int i, qntdNums, num, numAux, numInv = 0;
 
     // printf("Digite a quantidade de Numeros: "); 
     // laço para verificar se a qntd numeros é maior que 0
@@ -17,11 +17,11 @@ int main(){
 
     char **res = (char **) malloc(qntdNums * sizeof(char *));
 
-    for(int i = 0; i < qntdNums; i++){
+    for(i = 0; i < qntdNums; i++){
         res[i] = (char *) malloc(4 * sizeof(char));
     }
 
-    for(int i = 0; i < qntdNums; i++){
+    for(i = 0; i < qntdNums; i++){
 
         //printf("Digite o numero: "); 
         scanf("%d", &num);
@@ -41,7 +41,7 @@ int main(){
     
      }
     
-    for(int i = 0; i < qntdNums; i++){
+    for(i = 0; i < qntdNums; i++){
         printf("%s ", res[i]);
         free(res[i]);
     }

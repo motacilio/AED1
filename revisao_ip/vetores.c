@@ -4,7 +4,7 @@
 #define MAX_DIG 41
 int main(){
 
-    int t; 
+    int i, j, k, t; 
 
     while(1){         
         scanf("%d", &t);
@@ -18,7 +18,7 @@ int main(){
 
     char **resultados = (char **) malloc(t * sizeof(char *));
     
-    for(int i = 0; i < t; i++){
+    for(i = 0; i < t; i++){
         char num1[MAX_DIG];
         char num2[MAX_DIG];
 
@@ -32,15 +32,13 @@ int main(){
             strcpy(resultados[i], "0");
             continue;
         }
-
-        for(int j = 0; j < tam1+tam2; j++){
+        for(j = 0; j < tam1+tam2; j++){
             resultados[i][j] = '0';
         }
         resultados[i][tam1+tam2] = '\0';
         
-
-        for(int j = tam1 - 1; j >= 0; j--){
-            for(int k = tam2 - 1; k >= 0; k--){
+        for(j = tam1 - 1; j >= 0; j--){
+            for(k = tam2 - 1; k >= 0; k--){
 
                 int digitoNum1 = num1[j] - '0'; 
                 int digitoNum2 = num2[k] - '0';
@@ -57,7 +55,7 @@ int main(){
         }
     }
     
-    for(int j = 0; j < t; j++){
+    for(j = 0; j < t; j++){
         int comeco = 0;
         while(resultados[j][comeco] == '0' && resultados[j][comeco + 1] != '\0'){
             comeco++;

@@ -7,16 +7,15 @@
 
 int main(){
 
-    int n;
+    int n, i;
     scanf("%d", &n);
 
     int *resultados = (int *) calloc(n,  sizeof(int));
 
-    for(int i = 0; i < n; i++){
+    for(i = 0; i < n; i++){
 
         char fig; scanf(" %c", &fig);
         fig = toupper(fig);
-        printf("Figura lida: %c\n", fig);
 
         if(fig == 'C'){
             int raio; scanf("%d", &raio);
@@ -42,8 +41,8 @@ int main(){
         }
     }
     
-    for(int j = 0; j < n; j++){
-    printf("%d\n", resultados[j]);
+    for(i = 0; i < n; i++){
+    printf("%d\n", resultados[i]);
     }
     free(resultados);
 }
