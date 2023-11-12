@@ -26,4 +26,6 @@ int subconjunto(Conjunto *, Conjunto *);
 
 Conjunto complemento(Conjunto *, Conjunto *);
 
+Conjunto uniao(Conjunto *, Conjunto *);
 
+Conjunto interseccao(Conjunto *, Conjunto *);
