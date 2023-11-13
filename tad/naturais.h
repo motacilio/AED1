@@ -29,3 +29,7 @@ Conjunto complemento(Conjunto *, Conjunto *);
 Conjunto uniao(Conjunto *, Conjunto *);
 
 Conjunto interseccao(Conjunto *, Conjunto *);
+
+Conjunto diferenca(Conjunto *, Conjunto *);
+
+Conjunto conjuntoPartes(Conjunto *);

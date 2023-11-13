@@ -325,6 +325,40 @@ Conjunto interseccao(Conjunto *C1, Conjunto *C2)
 
 }
 
+Conjunto diferenca(Conjunto *C1, Conjunto *C2){
+    Conjunto conjDiff;
+    criaConjunto(&conjDiff);
+    
+    int i;
+    for (i = 0; i < C1->tamanho; i++)
+    {
+        int estaEmC2 = pertenceConjunto(C1->elementos[i], C2);
+
+        if (estaEmC2 == 0)
+        {
+            insereElementoConjunto(C1->elementos[i], &conjDiff);
+        }
+    }
+    return conjDiff;
+}
+
+Conjunto conjuntoPartes(Conjunto *C){
+    Conjunto *conjPartes = NULL;
+    int qntConjPartes = 0;
+    int i, j;
+    for(i = 0; i<C->tamanho - 1; i++){
+        Conjunto subConjAtual;
+        criaConjunto(&subConjAtual);
+        for(j = i; j<C->tamanho - 1; j++){
+            insereElementoConjunto(C->elementos[j], &subConjAtual);
+        }
+        conjPartes = (Conjunto *)realloc(conjPartes, (qntConjPartes + 1) * sizeof(Conjunto));
+        conjPartes->elementos[qntConjPartes] = &subConjAtual;
+        qntConjPartes++;
+    }
+    return *conjPartes;
+}
+
 int main()
 {
 
@@ -334,7 +368,25 @@ int main()
 
     while (1)
     {
-        printf("Digite a opcao: \n");
+        printf("------------------------------------------------------\n");
+        printf("BEM-VINDO AO CONJUNTO CONSTRUCTOR\n");
+        printf("------------------------------------------------------\n");
+        printf("1 - Criar novo conjunto\n");
+        printf("2 - Verificar se um conjunto esta vazio\n");
+        printf("3 - Inserir elemento em um conjunto\n");
+        printf("4 - Excluir elemento de um conjunto\n");
+        printf("5 - Calcular a cardinalidade de um conjunto\n");
+        printf("6 - Determinar quantos elementos de um conjunto sao maiores que x\n");
+        printf("7 - Determinar quantos elementos de um conjunto sao menores que x\n");
+        printf("8 - verificar se o elemento x pertence a um conjunto\n");
+        printf("9 - Verificar se dois conjuntos sao identicos\n");
+        printf("10 - Identificar se o conjunto C1 é subconjunto de C2\n");
+        printf("11 - Gerar o complemento do conjunto C1 em relacao ao conjunto C2\n");
+        printf("12 - Gerar a uniao do conjunto C1 em relacao a C2\n");
+        printf("13 - Gerar a interssecção do conjunto C1 em relacao a C2\n");
+        printf("14 - Gerar a diferença entre o conjunto C1 em relacao a C2\n");
+        printf("99 - mostrar os elementos de um conjunto\n");
+        printf("Digite a opcao desejada: \n");
         int opcao;
         scanf("%d", &opcao);
 
@@ -510,6 +562,25 @@ int main()
                 return 1;
             }
             lisConjuntos[qntConjuntos] = novaInter;
+            qntConjuntos++;
+            printf("Conjunto %d criado!\n", qntConjuntos);
+
+        } else if(opcao == 14){
+            printf("Digite o primeiro conjunto desejado: \n");
+            scanf("%d", &conjun);
+            conjun--;
+            printf("Digite o segundo conjunto desejado: \n");
+            scanf("%d", &conjun2);
+            conjun2--;
+
+            Conjunto novaDiff = diferenca(&lisConjuntos[conjun], &lisConjuntos[conjun2]);
+            lisConjuntos = (Conjunto *)realloc(lisConjuntos, (qntConjuntos + 1) * sizeof(Conjunto));
+            if (lisConjuntos == NULL)
+            {
+                printf("Falha ao alocar memoria\n");
+                return 1;
+            }
+            lisConjuntos[qntConjuntos] = novaDiff;
             qntConjuntos++;
             printf("Conjunto %d criado!\n", qntConjuntos);
 
