@@ -1,8 +1,8 @@
+typedef struct conjunto Conjunto;
+
 void quicksort(int *, int, int);
 
 int buscaBin(int *, int, int, int);
-
-typedef struct conjunto Conjunto;
 
 int criaConjunto(Conjunto *);
 
@@ -33,3 +33,9 @@ Conjunto interseccao(Conjunto *, Conjunto *);
 Conjunto diferenca(Conjunto *, Conjunto *);
 
 Conjunto conjuntoPartes(Conjunto *);
+
+void mostraConjunto(Conjunto *, int);
+
+int copiarConjunto(Conjunto *, Conjunto *);
+
+int destroiConjunto(Conjunto *);

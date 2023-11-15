@@ -1,17 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "naturais.h"
 #include <limits.h>
 
-void exibirArray(int *elementos, int tamanho)
-{
-    for (int i = 0; i < tamanho; i++)
-    {
-        printf("%d ", elementos[i]);
-    }
-    printf("\n");
-}
+#define MAX_ELEMENTOS 1000000 
 
+
+/*-----------------------------------------------------------------
+ARQUIVO.h
+------------------------------------------------------------------*/
+typedef struct conjunto Conjunto;
+
+void quicksort(int *, int, int);
+
+int buscaBin(int *, int, int, int);
+
+int criaConjunto(Conjunto *);
+
+int conjuntoVazio(Conjunto *C);
+
+int insereElementoConjunto(int, Conjunto *);
+
+int excluirElementoConjunto(int, Conjunto *);
+
+int tamanhoConjunto(Conjunto *);
+
+int maior(int, Conjunto *);
+
+int menor(int, Conjunto *);
+
+int pertenceConjunto(int, Conjunto *);
+
+int conjuntosIdenticos(Conjunto *, Conjunto *);
+
+int subconjunto(Conjunto *, Conjunto *);
+
+Conjunto complemento(Conjunto *, Conjunto *);
+
+Conjunto uniao(Conjunto *, Conjunto *);
+
+Conjunto interseccao(Conjunto *, Conjunto *);
+
+Conjunto diferenca(Conjunto *, Conjunto *);
+
+Conjunto conjuntoPartes(Conjunto *);
+
+void mostraConjunto(Conjunto *, int);
+
+int copiarConjunto(Conjunto *, Conjunto *);
+
+int destroiConjunto(Conjunto *);
+
+/*
+---------------------------------------------------------------------------
+ARQUIVO.c
+--------------------------------------------------------------------------*/ 
 void quicksort(int *arr, int baixo, int alto)
 {
     if (baixo < alto)
@@ -100,28 +142,41 @@ int conjuntoVazio(Conjunto *C)
 
 int insereElementoConjunto(int x, Conjunto *C)
 {
-    if (C->elementos == NULL)
-    {
-        C->elementos = (int *)malloc(sizeof(int));
+    if(C != NULL && C->tamanho < MAX_ELEMENTOS && x < LONG_MAX && x > LONG_MIN){
+            
+        quicksort(C->elementos, 0, C->tamanho - 1);
+        int indElemento = buscaBin(C->elementos, x, 0, C->tamanho - 1);
+        if (indElemento != -1)
+        {
+            printf("Elemento já presente no conjunto\n");
+            return 0;
+        }
+
         if (C->elementos == NULL)
+        {
+            C->elementos = (int *)malloc(sizeof(int));
+            if (C->elementos == NULL)
+            {
+                return 0;
+            }
+            C->tamanho = 1;
+            C->elementos[0] = x;
+            return 1;
+        }
+
+        int *novoElementos = (int *)realloc(C->elementos, (C->tamanho + 1) * sizeof(int));
+        if (novoElementos == NULL)
         {
             return 0;
         }
-        C->tamanho = 1;
-        C->elementos[0] = x;
+        C->elementos = novoElementos;
+        C->elementos[C->tamanho] = x;
+        C->tamanho++;
+
         return 1;
     }
 
-    int *novoElementos = (int *)realloc(C->elementos, (C->tamanho + 1) * sizeof(int));
-    if (novoElementos == NULL)
-    {
-        return 0;
-    }
-    C->elementos = novoElementos;
-    C->elementos[C->tamanho] = x;
-    C->tamanho++;
-    quicksort(C->elementos, 0, C->tamanho - 1);
-    return 1;
+    return 0;
 }
 
 int excluirElementoConjunto(int x, Conjunto *C)
@@ -139,9 +194,8 @@ int excluirElementoConjunto(int x, Conjunto *C)
         {
             C->elementos[i] = C->elementos[i + 1];
         }
-        C->elementos = realloc(C->elementos, (C->tamanho - 1) * sizeof(int));
-        C->tamanho--;
-        quicksort(C->elementos, 0, C->tamanho - 1);
+        C->elementos = (int *)realloc(C->elementos, (C->tamanho - 1) * sizeof(int));
+        C->tamanho--;  
         return 1;
     }
     return 0;
@@ -156,48 +210,35 @@ int maior(int x, Conjunto *C)
 {
     quicksort(C->elementos, 0, C->tamanho - 1);
     int indElemen = buscaBin(C->elementos, x, 0, C->tamanho - 1);
-    int i, qntMaiores = 0;
-    if (indElemen == 0)
+
+    if (indElemen == -1)
     {
-        return 0;
+        return C->tamanho;
     }
-    else if (indElemen != -1)
+    else
     {
         return C->tamanho - indElemen - 1;
     }
-    else if (indElemen == -1)
-    {
-        for (i = 0; i < C->tamanho - 1; i++)
-        {
-            int elementoAtual = C->elementos[i];
-            if (elementoAtual > x)
-            {
-                qntMaiores++;
-            }
-        }
-        return qntMaiores;
-    }
-    return -1;
 }
+
 
 int menor(int x, Conjunto *C)
 {
-    int i, qntMenores = 0;
-    for (i = 0; i < C->tamanho - 1; i++)
-    {
-        int elementoAtual = C->elementos[i];
-        if (elementoAtual < x)
-        {
-            qntMenores++;
-        }
-    }
+    quicksort(C->elementos, 0, C->tamanho - 1);
+    int indElemen = buscaBin(C->elementos, x, 0, C->tamanho - 1);
 
-    if (qntMenores == C->tamanho - 1)
+    if (indElemen == -1)
     {
-        return 0;
+        // Elemento não encontrado, todos são menores
+        return C->tamanho;
     }
-    return qntMenores;
+    else
+    {
+        // Elemento encontrado, retorna a quantidade de elementos menores
+        return indElemen;
+    }
 }
+
 
 int pertenceConjunto(int x, Conjunto *C)
 {
@@ -300,7 +341,12 @@ Conjunto uniao(Conjunto *C1, Conjunto *C2)
         }
     }
 
-    quicksort(conjUniao.elementos, 0, conjUniao.tamanho - 1);
+    if(conjUniao.tamanho > MAX_ELEMENTOS){
+        printf("Tamanho estourou o limite\n");
+        conjUniao.tamanho = 0;
+        free(conjUniao.elementos);
+        conjUniao.elementos = NULL;
+    }    
 
     return conjUniao;
 }
@@ -309,7 +355,7 @@ Conjunto interseccao(Conjunto *C1, Conjunto *C2)
 {
     Conjunto conjInter;
     criaConjunto(&conjInter);
-    
+
     int i;
     for (i = 0; i < C2->tamanho; i++)
     {
@@ -322,13 +368,13 @@ Conjunto interseccao(Conjunto *C1, Conjunto *C2)
     }
 
     return conjInter;
-
 }
 
-Conjunto diferenca(Conjunto *C1, Conjunto *C2){
+Conjunto diferenca(Conjunto *C1, Conjunto *C2)
+{
     Conjunto conjDiff;
     criaConjunto(&conjDiff);
-    
+
     int i;
     for (i = 0; i < C1->tamanho; i++)
     {
@@ -342,32 +388,98 @@ Conjunto diferenca(Conjunto *C1, Conjunto *C2){
     return conjDiff;
 }
 
-Conjunto conjuntoPartes(Conjunto *C){
-    Conjunto *conjPartes = NULL;
-    int qntConjPartes = 0;
+Conjunto conjuntoPartes(Conjunto *C)
+{
+    Conjunto conjuntoPartes;
+    criaConjunto(&conjuntoPartes);
+
+    int totalSubconjuntos = 1 << C->tamanho; // 2 elevado à potência do tamanho de C
     int i, j;
-    for(i = 0; i<C->tamanho - 1; i++){
-        Conjunto subConjAtual;
-        criaConjunto(&subConjAtual);
-        for(j = i; j<C->tamanho - 1; j++){
-            insereElementoConjunto(C->elementos[j], &subConjAtual);
+
+    for (i = 0; i < totalSubconjuntos; i++)
+    {
+        criaConjunto(&conjuntoPartes);
+        for (j = 0; j < C->tamanho; j++)
+        {
+            if ((i & (1 << j)) != 0)
+            {
+                // Se o j-ésimo bit de i está definido, adiciona o elemento correspondente
+                insereElementoConjunto(C->elementos[j], &conjuntoPartes);
+            }
         }
-        conjPartes = (Conjunto *)realloc(conjPartes, (qntConjPartes + 1) * sizeof(Conjunto));
-        conjPartes->elementos[qntConjPartes] = &subConjAtual;
-        qntConjPartes++;
+
+        printf("Subconjunto %d: ", i + 1);
+        mostraConjunto(&conjuntoPartes, 1);  
+
     }
-    return *conjPartes;
+
+    return conjuntoPartes;
+}
+
+void mostraConjunto(Conjunto *C, int ordem)
+{
+   
+    if (ordem == 1)
+    {   
+        printf("{");
+        for (int i = 0; i < C->tamanho; i++)
+        {   
+            printf("%d ", C->elementos[i]);
+        }
+        printf("}");
+        printf("\n");
+    }
+    else if (ordem == 0)
+    {   
+        printf("{");
+        for (int i = C->tamanho - 1; i >= 0; i--)
+        {
+            printf("%d ", C->elementos[i]);
+        }
+        printf("}");
+        printf("\n");
+    }
+    else
+    {
+        printf("Ordem inválida! Digite 1 para crescente ou 0 para decrescente.\n");
+    }
+}
+
+int copiarConjunto(Conjunto *C1, Conjunto *C2){
+    if (C1 == NULL || C2 == NULL)
+    {
+        return 0;
+    }
+
+    for(int i = C2->tamanho, j = 0; j < C1->tamanho; j++, i++){
+        insereElementoConjunto(C1->elementos[j], C2);
+    }
+
+    if(C2->tamanho > MAX_ELEMENTOS){
+        printf("A copia estourou o tamanho maximo permitido\n");
+        C2->tamanho = 0;
+        free(C2->elementos);
+        C2->elementos = NULL;
+    }
+
+    return 1;
+}
+
+
+
+int destroiConjunto(Conjunto *C) {
+    if (C == NULL) {
+        return 0;
+    }
+    free(C->elementos);
+    C->elementos = NULL; 
+    C->tamanho = 0; 
+
+    return 1; 
 }
 
 int main()
 {
-
-    Conjunto *lisConjuntos = NULL;
-    int qntConjuntos = 0; // o indice
-    int conjun, conjun2;
-
-    while (1)
-    {
         printf("------------------------------------------------------\n");
         printf("BEM-VINDO AO CONJUNTO CONSTRUCTOR\n");
         printf("------------------------------------------------------\n");
@@ -385,8 +497,22 @@ int main()
         printf("12 - Gerar a uniao do conjunto C1 em relacao a C2\n");
         printf("13 - Gerar a interssecção do conjunto C1 em relacao a C2\n");
         printf("14 - Gerar a diferença entre o conjunto C1 em relacao a C2\n");
-        printf("99 - mostrar os elementos de um conjunto\n");
-        printf("Digite a opcao desejada: \n");
+        printf("15 - Gerar os subconjuntos de um conjunto\n");
+        printf("16 - mostrar os elementos de um conjunto\n");
+        printf("17 - copiar o conjunto C1 para o conjunto C2\n");
+        printf("18 - Destruir um conjunto \n");
+        printf("0 - Parar o programa\n");
+        printf("99 - Mostrar este menu novamente");
+
+    Conjunto *lisConjuntos = NULL;
+    int qntConjuntos = 0; // o indice
+    int conjun, conjun2;
+
+
+    while (1)
+    {
+
+        printf("\n Digite a opcao desejada: \n");
         int opcao;
         scanf("%d", &opcao);
 
@@ -395,7 +521,7 @@ int main()
             lisConjuntos = (Conjunto *)realloc(lisConjuntos, (qntConjuntos + 1) * sizeof(Conjunto));
             if (lisConjuntos == NULL)
             {
-                printf("Falha ao alocar memoria\n");
+                printf("Falha ao criar conjunto\n");
                 return 1;
             }
             criaConjunto(&lisConjuntos[qntConjuntos]);
@@ -404,10 +530,17 @@ int main()
         }
         else if (opcao == 2)
         {
-            printf("Digite o conjunto desejado:\n");
+            printf("Digite o conjunto:\n");
             scanf("%d", &conjun);
-            int isVazio = conjuntoVazio(&lisConjuntos[conjun - 1]);
-            printf("%d\n\n", isVazio);
+            conjun--;
+            
+
+            int isVazio = conjuntoVazio(&lisConjuntos[conjun]);
+            if(isVazio == 1){
+                printf("Conjunto Vazio!\n");
+            } else{
+                printf("Conjunto nao vazio!");
+            }
         }
         else if (opcao == 3)
         {
@@ -417,12 +550,13 @@ int main()
             printf("Digite o elemento a ser inserido:\n");
             int x;
             scanf("%d", &x);
+            conjun--;
 
-            quicksort(lisConjuntos[conjun - 1].elementos, 0, (lisConjuntos[conjun - 1].tamanho - 1));
-            int elemento = buscaBin(lisConjuntos[conjun - 1].elementos, x, 0, lisConjuntos[conjun - 1].tamanho - 1);
+            quicksort(lisConjuntos[conjun].elementos, 0, (lisConjuntos[conjun].tamanho - 1));
+            int elemento = buscaBin(lisConjuntos[conjun].elementos, x, 0, lisConjuntos[conjun].tamanho - 1);
             if (elemento == -1)
             {
-                insereElementoConjunto(x, &lisConjuntos[conjun - 1]);
+                insereElementoConjunto(x, &lisConjuntos[conjun]);
             }
             else
             {
@@ -433,13 +567,12 @@ int main()
         {
             printf("Digite o conjunto desejado:\n");
             scanf("%d", &conjun);
-            conjun = conjun - 1;
+            conjun--;
             printf("Digite o elemento a ser excluido:\n");
             int x;
             scanf("%d", &x);
 
             excluirElementoConjunto(x, &lisConjuntos[conjun]);
-            exibirArray(lisConjuntos[conjun].elementos, lisConjuntos[conjun].tamanho);
         }
         else if (opcao == 5)
         {
@@ -484,8 +617,13 @@ int main()
             printf("Digite o elemento:\n");
             int x;
             scanf("%d", &x);
-
-            printf("%d\n", pertenceConjunto(x, &lisConjuntos[conjun]));
+            int pertence = pertenceConjunto(x, &lisConjuntos[conjun]);
+            if(pertence == 1){
+                printf("O elemento %d pertence ao conjunto!\n", x);
+            } else{
+                printf("O elemento %d nao pertence ao conjunto.\n", x);       
+            }
+            
         }
         else if (opcao == 9)
         {
@@ -495,7 +633,12 @@ int main()
             printf("Digite o segundo conjunto desejado: \n");
             scanf("%d", &conjun2);
             conjun2--;
-            printf("%d\n", conjuntosIdenticos(&lisConjuntos[conjun], &lisConjuntos[conjun2]));
+            int saoIdenticos = conjuntosIdenticos(&lisConjuntos[conjun], &lisConjuntos[conjun2]);
+            if(saoIdenticos == 1){
+                printf("Os conjuntos sao identicos\n");
+            } else{
+                printf("Os conjuntos nao sao identicos\n");
+            }
         }
         else if (opcao == 10)
         {
@@ -505,7 +648,12 @@ int main()
             printf("Digite o segundo conjunto desejado: \n");
             scanf("%d", &conjun2);
             conjun2--;
-            printf("%d \n", subconjunto(&lisConjuntos[conjun], &lisConjuntos[conjun2]));
+            int ehSubconjunto = subconjunto(&lisConjuntos[conjun], &lisConjuntos[conjun2]); 
+            if(ehSubconjunto == 1){
+                printf("O conjunto %d é subconjunto do conjunto %d", ++conjun, ++conjun2);
+            } else{
+                printf("O conjunto %d nao é subconjunto do conjunto %d", ++conjun, ++conjun2);       
+            }
         }
         else if (opcao == 11)
         {
@@ -546,7 +694,9 @@ int main()
             lisConjuntos[qntConjuntos] = novaUniao;
             qntConjuntos++;
             printf("Conjunto %d criado!\n", qntConjuntos);
-        } else if(opcao == 13){
+        }
+        else if (opcao == 13)
+        {
             printf("Digite o primeiro conjunto desejado: \n");
             scanf("%d", &conjun);
             conjun--;
@@ -564,8 +714,9 @@ int main()
             lisConjuntos[qntConjuntos] = novaInter;
             qntConjuntos++;
             printf("Conjunto %d criado!\n", qntConjuntos);
-
-        } else if(opcao == 14){
+        }
+        else if (opcao == 14)
+        {
             printf("Digite o primeiro conjunto desejado: \n");
             scanf("%d", &conjun);
             conjun--;
@@ -583,18 +734,82 @@ int main()
             lisConjuntos[qntConjuntos] = novaDiff;
             qntConjuntos++;
             printf("Conjunto %d criado!\n", qntConjuntos);
-
         }
-        else if (opcao == 0)
-        {
-            break;
-        }
-        else if (opcao == 99)
+        else if (opcao == 15)
         {
             printf("Digite o conjunto desejado: \n");
             scanf("%d", &conjun);
             conjun--;
-            exibirArray(lisConjuntos[conjun].elementos, lisConjuntos[conjun].tamanho);
+            conjuntoPartes(&lisConjuntos[conjun]);
+        }
+        else if (opcao == 16)
+        {
+            printf("Digite o conjunto desejado: \n");
+            scanf("%d", &conjun);
+            conjun--;
+            printf("Digite a ordem desejada: (1 - crescente | 0 - decrescente):\n");
+            int ordem;
+            scanf("%d", &ordem);
+            printf("elementos: \n");
+            mostraConjunto(&lisConjuntos[conjun], ordem);
+        } else if(opcao == 17){
+
+            printf("Digite o primeiro conjunto: \n");
+            scanf("%d", &conjun);
+            conjun--;
+            printf("Digite o segundo conjunto: \n");
+            scanf("%d", &conjun2);
+            conjun2--;
+
+            int resultadoCopia = copiarConjunto(&lisConjuntos[conjun], &lisConjuntos[conjun2]);
+
+            if(resultadoCopia == 1){
+                printf("Copia realizada com sucesso\n");
+            } else {
+                printf("Falha ao copiar \n");
+            }
+        } else if(opcao == 18){
+            printf("Digite o conjunto a ser destruído: \n");
+            scanf("%d", &conjun);
+            conjun--;
+
+            int resultadoDestruir = destroiConjunto(&lisConjuntos[conjun]);
+            if(resultadoDestruir == 1){
+                printf("Conjunto %d destruído!\n", ++conjun);
+            } else {
+                printf("falha ao destruir o conjunto\n");
+            }
+        } else if(opcao == 99){
+            printf("------------------------------------------------------\n");
+            printf("BEM-VINDO AO CONJUNTO CONSTRUCTOR\n");
+            printf("------------------------------------------------------\n");
+            printf("1 - Criar novo conjunto\n");
+            printf("2 - Verificar se um conjunto esta vazio\n");
+            printf("3 - Inserir elemento em um conjunto\n");
+            printf("4 - Excluir elemento de um conjunto\n");
+            printf("5 - Calcular a cardinalidade de um conjunto\n");
+            printf("6 - Determinar quantos elementos de um conjunto sao maiores que x\n");
+            printf("7 - Determinar quantos elementos de um conjunto sao menores que x\n");
+            printf("8 - verificar se o elemento x pertence a um conjunto\n");
+            printf("9 - Verificar se dois conjuntos sao identicos\n");
+            printf("10 - Identificar se o conjunto C1 é subconjunto de C2\n");
+            printf("11 - Gerar o complemento do conjunto C1 em relacao ao conjunto C2\n");
+            printf("12 - Gerar a uniao do conjunto C1 em relacao a C2\n");
+            printf("13 - Gerar a interssecção do conjunto C1 em relacao a C2\n");
+            printf("14 - Gerar a diferença entre o conjunto C1 em relacao a C2\n");
+            printf("15 - Gerar os subconjuntos de um conjunto\n");
+            printf("16 - mostrar os elementos de um conjunto\n");
+            printf("17 - copiar o conjunto C1 para o conjunto C2\n");
+            printf("18 - Destruir um conjunto \n");
+            printf("0 - Parar o programa\n");
+            printf("99 - Mostrar este menu novamente");
+        }
+        else if (opcao == 0)
+        {
+            for(int i = 0; i < qntConjuntos; i++){
+                free(lisConjuntos[i].elementos);
+            }
+            break;
         }
     }
 }
