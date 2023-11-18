@@ -538,6 +538,10 @@ int main(){
             
         }
         else if(opcao == 0){
+            for(int i = 0; i < numDatas; i++){
+                free(&datas[data]);
+            }
+            free(datas);
             break;
         } else if(opcao == 99){
             opcoes();
