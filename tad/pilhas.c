@@ -24,6 +24,7 @@ void opcoes(){
     printf("99 - exibe as opcoes novamente\n");
 }
 
+
 typedef struct pilha Pilha;
 
 int create(Pilha *P);
@@ -98,12 +99,12 @@ int isEqual(Pilha *P1, Pilha *P2){
 void show(Pilha *P, int ordem){
     if(P->topo == -1){
         printf("PILHA VAZIA\n");
-    } else if(ordem == TOPO){
+    } else if(ordem == BASE){
         printf("Elementos:\n");
         for(int i = 0; i <= P->topo; i++){
             printf("%ld\n", P->elementos[i]);
         }
-    } else if(ordem == BASE){
+    } else if(ordem == TOPO){
         printf("Elementos:\n");
         for(int i = P->topo; i >= 0; i--){
             printf("%ld\n", P->elementos[i]);
