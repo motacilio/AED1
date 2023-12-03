@@ -97,8 +97,7 @@ int main(){
         Fila_adicionar_fim(fila, pAtual);
     }   
 
-    Fila_imprimir(fila);
-    printf("\n\n");
+
 
     // quantidade de quem abandonou a fila
     int s; scanf("%d", &s);
